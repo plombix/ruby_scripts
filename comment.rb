@@ -14,7 +14,12 @@
 
 # ***********************hack to force install dep**************************** #
 #                                                                              #
-`gem install colorize` unless `gem which colorize`[-12..-1] == "colorize.rb\n"
+begin
+  require 'colorize'
+rescue LoadError
+  system('gem install colorize')
+  Gem.clear_paths
+end
 #                                                                              #
 # **************************************************************************** #
 require 'colorize'
