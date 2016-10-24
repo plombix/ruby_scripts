@@ -1,3 +1,16 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    random_people.rb                                   :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: sballet <sballet@student.42.fr>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2016/07/04 14:47:15 by sballet           #+#    #+#              #
+#    Updated: 2016/07/06 13:37:24 by sballet          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+# !/usr/bin/env ruby -w
 begin
   require 'ffaker'
 rescue LoadError
@@ -7,7 +20,13 @@ end
 require 'fileutils'
 require 'open-uri'
 
+# Get vars
+#===============================================================================
 current_path = Dir.pwd
+people_path = File.join(current_path, 'people')
+
+# If no args
+#===============================================================================
 if ARGV.empty?
   puts 'usage: two options available, a num  OR clean '
   puts 'like so:'
@@ -16,13 +35,15 @@ if ARGV.empty?
   puts "labeled by number suffixed by type and place in a folder 'people'"
   puts "\truby random_people.rb clean"
   puts 'clean will clean the content of the people folder previously created'
+
+# if clean
+#===============================================================================
 elsif ARGV[0] == 'clean'
-  people_path = File.join(current_path, 'people')
   if File.exist?(people_path)
-    Dir.entries(people_path).each do |_f|
+    Dir.entries(people_path).each do |f|
       unless _f[0] == '.'
-        File.delete(File.join(people_path, _f))
-        puts "deleting #{people_path}/#{_f}"
+        File.delete(File.join(people_path, f))
+        puts "deleting #{people_path}/#{f}"
       end
     end
     FileUtils.remove_dir(people_path)
@@ -30,7 +51,9 @@ elsif ARGV[0] == 'clean'
   else
     puts "No 'people' folder to clean , generate some first!"
   end
-# get num
+
+# if num
+#===============================================================================
 elsif begin
          custom_range = Integer(ARGV[0])
        rescue
@@ -41,23 +64,28 @@ elsif begin
   Dir.mkdir('people') unless File.exist?('people')
   people_path = File.join(current_path, 'people')
 
+  # make files and move in folder
   custom_range.times do |tm|
     puts "Generating nb: #{tm}"
     pict = File.new("#{tm}.png", 'wb') << open(FFaker::Avatar.image).read
-    File.rename(File.join(current_path, pict.path), File.join(people_path, pict.path))
-    add = File.open("#{tm}.add", 'a+') do |f|
+    File.rename(File.join(current_path, pict.path), File.join(people_path,
+                                                              pict.path))
+    File.open("#{tm}.add", 'a+') do |f|
       f.puts FFaker::AddressFR.full_address
-      File.rename(File.join(current_path, f.path), File.join(people_path, f.path))
+      File.rename(File.join(current_path, f.path), File.join(people_path,
+                                                             f.path))
     end
-    job = File.open("#{tm}.work", 'a+') do |f|
+    File.open("#{tm}.work", 'a+') do |f|
       f.puts FFaker::JobFR.title
-      File.rename(File.join(current_path, f.path), File.join(people_path, f.path))
+      File.rename(File.join(current_path, f.path), File.join(people_path,
+                                                             f.path))
     end
-    num = File.open("#{tm}.tel", 'a+') do |f|
+    File.open("#{tm}.tel", 'a+') do |f|
       f.puts FFaker::PhoneNumberFR.home_work_phone_number
       f.puts FFaker::PhoneNumberFR.home_work_phone_number
       f.puts FFaker::PhoneNumberFR.mobile_phone_number
-      File.rename(File.join(current_path, f.path), File.join(people_path, f.path))
+      File.rename(File.join(current_path, f.path), File.join(people_path,
+                                                             f.path))
     end
   end
   puts 'Done generating'
