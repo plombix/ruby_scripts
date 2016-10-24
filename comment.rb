@@ -114,7 +114,7 @@ if ARGV.count == 0
   puts
   puts LN.colorize(:light_green)
 elsif ARGV[0] == 'co'
-  comment 
+  comment
 elsif ARGV[0] == 'unco'
   un_comment
 end
