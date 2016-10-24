@@ -1,5 +1,9 @@
-
-require 'ffaker'
+begin
+  require 'ffaker'
+rescue LoadError
+  system('gem install ffaker')
+  Gem.clear_paths
+end
 require 'fileutils'
 require 'open-uri'
 
