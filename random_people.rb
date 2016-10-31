@@ -70,12 +70,13 @@ elsif begin
   # make folder & path
   Dir.mkdir('people') unless File.exist?('people')
   people_path = File.join(current_path, 'people')
-
+  URL = 'http://www.flickr.com/services/feeds/photos_public.gne?format=rss_200'
   # make files and move in folder
-  rss = Urss.at('http://www.flickr.com/services/feeds/photos_public.gne?format=rss_200'); true
   custom_range.times do |tm|
     puts "Generating nb: #{tm}"
-    pict = File.new("#{tm}.jpg", 'wb') << open(rss.entries.first.medias.first.content_url).read
+    rss = Urss.at(URL); true
+    pict_url = rss.entries.first.medias.first.content_url
+    pict = File.new("#{tm}.jpg", 'wb') << open(pict_url).read
     File.rename(File.join(current_path, pict.path), File.join(people_path,
                                                               pict.path))
     File.open("#{tm}.add", 'a+') do |f|
