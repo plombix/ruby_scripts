@@ -17,8 +17,15 @@ rescue LoadError
   system('gem install ffaker')
   Gem.clear_paths
 end
+begin
+  require 'urss'
+rescue LoadError
+  system('gem install urss')
+  Gem.clear_paths
+end
 require 'fileutils'
 require 'open-uri'
+require 'pry'
 
 # Get vars
 #===============================================================================
@@ -41,7 +48,7 @@ if ARGV.empty?
 elsif ARGV[0] == 'clean'
   if File.exist?(people_path)
     Dir.entries(people_path).each do |f|
-      unless _f[0] == '.'
+      unless f[0] == '.'
         File.delete(File.join(people_path, f))
         puts "deleting #{people_path}/#{f}"
       end
@@ -65,13 +72,15 @@ elsif begin
   people_path = File.join(current_path, 'people')
 
   # make files and move in folder
+  rss = Urss.at('http://www.flickr.com/services/feeds/photos_public.gne?format=rss_200'); true
   custom_range.times do |tm|
     puts "Generating nb: #{tm}"
-    pict = File.new("#{tm}.png", 'wb') << open(FFaker::Avatar.image).read
+    pict = File.new("#{tm}.jpg", 'wb') << open(rss.entries.first.medias.first.content_url).read
     File.rename(File.join(current_path, pict.path), File.join(people_path,
                                                               pict.path))
     File.open("#{tm}.add", 'a+') do |f|
-      f.puts FFaker::AddressFR.full_address
+      f.puts FFaker::AddressFR.street_address
+      f.puts FFaker::AddressFR.postal_code.to_s + " #{FFaker::AddressFR.city}"
       File.rename(File.join(current_path, f.path), File.join(people_path,
                                                              f.path))
     end
@@ -80,9 +89,13 @@ elsif begin
       File.rename(File.join(current_path, f.path), File.join(people_path,
                                                              f.path))
     end
+    File.open("#{tm}.name", 'a+') do |f|
+      f.puts  FFaker::NameFR.first_name
+      f.puts  FFaker::NameFR.last_name
+      File.rename(File.join(current_path, f.path), File.join(people_path,
+                                                             f.path))
+    end
     File.open("#{tm}.tel", 'a+') do |f|
-      f.puts FFaker::PhoneNumberFR.home_work_phone_number
-      f.puts FFaker::PhoneNumberFR.home_work_phone_number
       f.puts FFaker::PhoneNumberFR.mobile_phone_number
       File.rename(File.join(current_path, f.path), File.join(people_path,
                                                              f.path))
